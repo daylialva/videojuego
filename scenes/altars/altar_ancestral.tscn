@@ -1,0 +1,290 @@
+[gd_scene format=3 uid="uid://s3qqjo3s12x0"]
+
+[ext_resource type="Script" uid="uid://m5m4tlp5st24" path="res://scripts/altars/altar_ancestral.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bmsu0ki1x7h3n" path="res://Assets/ruinas/AltarAncestralIzquierdaAtlas.png" id="2_altar"]
+[ext_resource type="Texture2D" uid="uid://cid7vvu8mkbpd" path="res://Assets/ruinas/AntorchaAltar8Frames.png" id="3_antorcha"]
+[ext_resource type="Texture2D" uid="uid://bqruwufl1tw34" path="res://Assets/effects/luz_radial_suave.png" id="4_light"]
+[ext_resource type="FontFile" uid="uid://31jst86mgp48" path="res://Assets/fonts/PirataOne-Regular.ttf" id="5_font"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_altar"]
+texture = ExtResource("2_altar")
+texture_region_size = Vector2i(64, 64)
+0:0/size_in_atlas = Vector2i(8, 6)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_antorcha"]
+texture = ExtResource("3_antorcha")
+texture_region_size = Vector2i(64, 64)
+0:0/size_in_atlas = Vector2i(1, 2)
+0:0/animation_speed = 6.0
+0:0/animation_frame_0/duration = 1.0
+0:0/animation_frame_1/duration = 1.0
+0:0/animation_frame_2/duration = 1.0
+0:0/animation_frame_3/duration = 1.0
+0:0/animation_frame_4/duration = 1.0
+0:0/animation_frame_5/duration = 1.0
+0:0/animation_frame_6/duration = 1.0
+0:0/animation_frame_7/duration = 1.0
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_altar"]
+tile_size = Vector2i(64, 64)
+sources/0 = SubResource("TileSetAtlasSource_altar")
+sources/1 = SubResource("TileSetAtlasSource_antorcha")
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_glow"]
+blend_mode = 1
+
+[sub_resource type="Animation" id="Animation_activar"]
+resource_name = "activar"
+length = 1.8
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("RuneGlow:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.7, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.45, 0.78]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("RuneLight:energy")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.7, 1.8),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.35, 0.9]
+}
+
+[sub_resource type="Animation" id="Animation_pulso"]
+resource_name = "pulso"
+length = 2.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("RuneGlow:modulate:a")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1.1, 2.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.65, 0.9, 0.65]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("RuneLight:energy")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1.1, 2.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.75, 1.05, 0.75]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_altar"]
+_data = {
+&"activar": SubResource("Animation_activar"),
+&"pulso": SubResource("Animation_pulso")
+}
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_interaction"]
+radius = 205.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.065, 0.12, 0.135, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.83, 0.69, 0.38, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.44)
+shadow_size = 7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button"]
+bg_color = Color(0.13, 0.19, 0.2, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.83, 0.69, 0.38, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="AltarAncestral" type="Node2D" unique_id=619919796]
+script = ExtResource("1_script")
+
+[node name="Altar" type="TileMapLayer" parent="." unique_id=1324232973]
+texture_filter = 1
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+tile_set = SubResource("TileSet_altar")
+
+[node name="Antorchas" type="TileMapLayer" parent="." unique_id=813941724]
+z_index = 1
+texture_filter = 1
+tile_map_data = PackedByteArray(0, 0, 255, 255, 255, 255, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)
+tile_set = SubResource("TileSet_altar")
+
+[node name="RuneGlow" type="Sprite2D" parent="." unique_id=332343677]
+modulate = Color(0.22, 0.86, 1, 0)
+z_index = 2
+material = SubResource("CanvasItemMaterial_glow")
+position = Vector2(78, -72)
+scale = Vector2(0.34, 0.34)
+texture = ExtResource("4_light")
+
+[node name="RuneLight" type="PointLight2D" parent="." unique_id=1869712896]
+position = Vector2(78, -72)
+color = Color(0.26, 0.8, 1, 1)
+energy = 0.0
+texture = ExtResource("4_light")
+texture_scale = 0.48
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1484626700]
+libraries/ = SubResource("AnimationLibrary_altar")
+
+[node name="InteractionArea" type="Area2D" parent="." unique_id=400634788]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="InteractionArea" unique_id=788545206]
+position = Vector2(-80, 75)
+shape = SubResource("CircleShape2D_interaction")
+
+[node name="AltarUI" type="CanvasLayer" parent="." unique_id=1679827883]
+layer = 12
+
+[node name="PromptLabel" type="Label" parent="AltarUI" unique_id=183237020]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -230.0
+offset_top = -113.0
+offset_right = 230.0
+offset_bottom = -76.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.98, 0.94, 0.77, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 22
+text = "Presiona E para interactuar"
+horizontal_alignment = 1
+
+[node name="ConfirmationPanel" type="Panel" parent="AltarUI" unique_id=115638897]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -340.0
+offset_top = -218.0
+offset_right = 340.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="QuestionLabel" type="Label" parent="AltarUI/ConfirmationPanel" unique_id=419012950]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 100.0
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
+theme_override_font_sizes/font_size = 22
+text = "¿Deseas entregar el fragmento de Illapa y la escama de serpiente?"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="YesButton" type="Button" parent="AltarUI/ConfirmationPanel" unique_id=150739767]
+layout_mode = 0
+offset_left = 190.0
+offset_top = 120.0
+offset_right = 320.0
+offset_bottom = 162.0
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button")
+text = "Sí"
+
+[node name="NoButton" type="Button" parent="AltarUI/ConfirmationPanel" unique_id=1707448848]
+layout_mode = 0
+offset_left = 360.0
+offset_top = 120.0
+offset_right = 490.0
+offset_bottom = 162.0
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button")
+text = "No"
+
+[node name="MessagePanel" type="Panel" parent="AltarUI" unique_id=845901011]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -340.0
+offset_top = -196.0
+offset_right = 340.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MessageLabel" type="Label" parent="AltarUI/MessagePanel" unique_id=2005031946]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 19.0
+offset_right = -24.0
+offset_bottom = 99.0
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 24
+text = "El equilibrio ancestral ha sido restaurado."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="CloseButton" type="Button" parent="AltarUI/MessagePanel" unique_id=1554956834]
+layout_mode = 0
+offset_left = 270.0
+offset_top = 112.0
+offset_right = 410.0
+offset_bottom = 150.0
+theme_override_colors/font_color = Color(0.96, 0.94, 0.84, 1)
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("StyleBoxFlat_button")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button")
+text = "Continuar"

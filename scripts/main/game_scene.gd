@@ -1,0 +1,66 @@
+extends Node2D
+
+signal levelup
+
+@export var escena_final_packed: PackedScene
+
+var total_enemies: int
+var killed_enemies: int = 0
+
+func _ready() -> void: 
+	var enemy_array: Array = get_tree().get_nodes_in_group("enemies") 
+	total_enemies = enemy_array.size()
+	for i in enemy_array: 
+		i.died.connect(experience_gained)
+	var player: CharacterBody2D = $level/Player
+	$UI/StatusHUD.bind_player(player)
+	if LanSession.active and not multiplayer.is_server():
+		return
+	levelup.connect(player.calculate_stats)
+	player.game_over.connect(display_escena_final)
+	
+func enemy_died(exp_reward: int) -> void:
+	killed_enemies += 1
+	experience_gained(exp_reward)
+	if killed_enemies == total_enemies and not LanSession.active:
+		display_escena_final(true)
+
+func experience_gained(exp_gain: int) -> void: 
+	if PlayerData.level == LevelData.MAX_LEVEL: 
+		return 
+	var new_experience: int = PlayerData.experience + exp_gain 
+	if new_experience >= LevelData.LEVEL_THRESHOLDS[PlayerData.level - 1]: 
+		level_up(new_experience) 
+	else: 
+		PlayerData.experience = new_experience 
+		SaveManager.save_game()
+
+func level_up(new_experience: int) -> void: 
+	print("Yay, I got more powerful!") 
+	new_experience -= LevelData.LEVEL_THRESHOLDS[PlayerData.level - 1] 
+	PlayerData.level += 1 
+	PlayerData.experience = new_experience
+	levelup.emit()
+	SaveManager.save_game()
+	
+func display_escena_final(victoria: bool) -> void: 
+	if get_node_or_null("UI/EscenaFinal") != null:
+		return
+	var escena_final_juego: Control = escena_final_packed.instantiate() 
+	escena_final_juego.victoria = victoria 
+	
+	var gestor_escena: Node = get_node("/root/GestorEscena") 
+	if LanSession.active:
+		escena_final_juego.repeat_level.connect(func(_origin: String) -> void: LanSession.request_replay())
+		escena_final_juego.menu.connect(func(_origin: String) -> void: LanSession.exit_to_menu())
+	else:
+		escena_final_juego.repeat_level.connect(gestor_escena.nuevo_juego)
+		escena_final_juego.menu.connect(gestor_escena.load_menu)
+	$UI.add_child(escena_final_juego)
+	
+	await get_tree().create_timer(0.4).timeout 
+	var player: CharacterBody2D = $level/Player
+	player.set_process_mode(PROCESS_MODE_DISABLED) 
+	var enemies: Array = get_tree().get_nodes_in_group("enemies") 
+	for i: CharacterBody2D in enemies: 
+		i.set_process_mode(PROCESS_MODE_DISABLED)

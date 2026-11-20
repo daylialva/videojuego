@@ -1,0 +1,99 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/network/network_menu.gd" id="1_script"]
+
+[sub_resource type="StyleBoxFlat" id="Frame"]
+bg_color = Color(0.055, 0.095, 0.105, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.74, 0.56, 0.32, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="NetworkMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.015, 0.025, 0.035, 0.72)
+
+[node name="Window" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -265.0
+offset_top = -220.0
+offset_right = 265.0
+offset_bottom = 220.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Frame")
+
+[node name="Content" type="VBoxContainer" parent="Window"]
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 0.05
+anchor_top = 0.05
+anchor_right = 0.95
+anchor_bottom = 0.95
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Title" type="Label" parent="Window/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.77, 0.46, 1)
+theme_override_font_sizes/font_size = 30
+text = "Partida LAN"
+horizontal_alignment = 1
+
+[node name="Help" type="Label" parent="Window/Content"]
+layout_mode = 2
+text = "El anfitrión crea la partida. El otro jugador escribe su IP."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Host" type="Button" parent="Window/Content"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Crear partida"
+
+[node name="Address" type="LineEdit" parent="Window/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+placeholder_text = "IP del anfitrión"
+
+[node name="Join" type="Button" parent="Window/Content"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+text = "Unirse a la partida"
+
+[node name="Status" type="Label" parent="Window/Content"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+autowrap_mode = 3
+horizontal_alignment = 1
+
+[node name="Back" type="Button" parent="Window/Content"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Volver al menú"

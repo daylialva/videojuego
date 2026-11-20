@@ -1,0 +1,177 @@
+extends CharacterBody2D
+
+signal died(exp: int)
+
+enum State {
+	IDLE,
+	CHASE,
+	RETURN,
+	ATTACK,
+	DEAD
+}
+
+@export_category("Stats")
+@export var speed: int = 128
+@export var attack_damage: int = 10
+@export var attack_speed: float = 1.0
+@export var hitpoints: int = 150
+@export var aggro_range: float = 256.0
+@export var attack_range: float = 80.0
+@export var exp_reward: int = 600
+
+
+var state: State = State.IDLE
+var attack_hit_registered: bool = false
+
+@onready var spawn_point: Vector2 = global_position
+@onready var animation_tree: AnimationTree = $AnimationTree
+@onready var animation_playback: AnimationNodeStateMachinePlayback = $AnimationTree.get("parameters/playback")
+var player: CharacterBody2D
+@onready var nav_agent: NavigationAgent2D = $NavigationAgent2D
+
+@export var drop_scene: PackedScene
+@export_range(0.0, 1.0) var drop_chance: float = 0.7
+@export var drop_random_common: bool = true
+@export_enum("COCA", "CHICHA_DE_JORA", "ILLA", "QUIPU", "ESCAMA_DE_AMARU", "FRAGMENTO_DE_ILLAPA", "SEMILLA_DE_PACHAMAMA") var specific_drop: int = 0
+
+func _ready() -> void:
+	animation_tree.set_active(true)
+
+func _physics_process(_delta: float) -> void:
+	if state == State.DEAD:
+		return
+	if LanSession.active and multiplayer.is_server():
+		player = null
+		var nearest := INF
+		for candidate in get_tree().get_nodes_in_group("player"):
+			if candidate is CharacterBody2D and (not candidate.has_method("is_dead") or not candidate.is_dead()):
+				var distance := global_position.distance_to(candidate.global_position)
+				if distance < nearest:
+					nearest = distance
+					player = candidate
+	elif not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group("player") as CharacterBody2D
+	if state == State.ATTACK:
+		return
+	if distance_to_player() <= attack_range:
+		state = State.ATTACK
+		attack()
+	elif distance_to_player() <= aggro_range:
+		state = State.CHASE
+		move()
+	elif global_position.distance_to(spawn_point) > 32:
+		state = State.RETURN
+		move()
+	elif state == State.IDLE:
+		state = State.IDLE
+		update_animation()
+
+func distance_to_player() -> float:
+	if not is_instance_valid(player):
+		return INF
+		
+	return global_position.distance_to(player.global_position)
+
+func move() -> void:
+	if state == State.CHASE: 
+		nav_agent.target_position = player.global_position 
+	elif state == State.RETURN: 
+		nav_agent.target_position = spawn_point 
+	var next_path_position: Vector2 = nav_agent.get_next_path_position() 
+	velocity = global_position.direction_to(next_path_position) * speed 
+	
+	if nav_agent.avoidance_enabled: 
+		nav_agent.set_velocity(velocity) 
+	else: 
+		_on_navigation_agent_2d_velocity_computed(velocity) 
+	move_and_slide() 
+	
+	if state == State.IDLE or state == State.CHASE: 
+		if velocity.x < -0.01: 
+			$Sprite2D.flip_h = true 
+		elif velocity.x > 0.01: 
+			$Sprite2D.flip_h = false 
+		
+	update_animation()
+
+func _on_navigation_agent_2d_velocity_computed(safe_velocity: Vector2) -> void:
+	nav_agent.velocity = safe_velocity
+
+func update_animation() -> void:
+	match state: 
+		State.IDLE: 
+			animation_playback.travel("idle") 
+		State.CHASE: 
+			animation_playback.travel("run") 
+		State.RETURN: 
+			animation_playback.travel("run") 
+		State.ATTACK: 
+			animation_playback.travel("attack")
+
+func attack() -> void:
+	if not is_instance_valid(player):
+		state = State.RETURN
+		return
+	attack_hit_registered = false
+	var player_pos: Vector2 = player.global_position 
+	var attack_dir: Vector2 = (player_pos - global_position).normalized() 
+	$Sprite2D.flip_h = attack_dir.x < 0 and abs(attack_dir.x) >= abs(attack_dir.y)
+	animation_tree.set("parameters/attack/BlendSpace2D/blend_position", attack_dir) 
+	update_animation() 
+	
+	var impact_delay: float = minf(attack_speed * 0.4, 0.4)
+	await get_tree().create_timer(impact_delay).timeout
+	if is_inside_tree() and state == State.ATTACK and is_instance_valid(player) and distance_to_player() <= attack_range:
+		_apply_attack_hit(player)
+	await get_tree().create_timer(maxf(attack_speed - impact_delay, 0.01)).timeout
+	if is_inside_tree() and state != State.DEAD:
+		state = State.IDLE
+
+func _apply_attack_hit(target: Node) -> void:
+	if attack_hit_registered or not is_instance_valid(target) or not target.has_method("take_damage"):
+		return
+	attack_hit_registered = true
+	target.take_damage(attack_damage)
+
+func take_damage(damage_taken: int) -> void:
+	if LanSession.active and not multiplayer.is_server():
+		var coordinator := get_tree().get_first_node_in_group("lan_coordinator")
+		if coordinator != null:
+			coordinator.request_enemy_hit.rpc_id(1, str(coordinator.get_parent().get_path_to(self)), damage_taken)
+		return
+	if state == State.DEAD:
+		return
+	hitpoints -= damage_taken
+	if hitpoints <= 0:
+		death()
+
+func death() -> void:
+	if state == State.DEAD:
+		return
+	state = State.DEAD
+	velocity = Vector2.ZERO
+	animation_tree.set_active(false)
+	if has_node("CollisionShape2D"):
+		$CollisionShape2D.set_deferred("disabled", true)
+	if has_node("HurtBox/CollisionShape2D"):
+		$HurtBox/CollisionShape2D.set_deferred("disabled", true)
+	died.emit(exp_reward)
+	$AnimationPlayer.play("death")
+	await $AnimationPlayer.animation_finished
+	if is_inside_tree():
+		_spawn_drop()
+		queue_free()
+
+func _on_hit_box_area_entered(area: Area2D) -> void:
+	if state == State.ATTACK and area.owner == player:
+		_apply_attack_hit(player)
+		
+func _spawn_drop() -> void:
+	if drop_scene == null or randf() > drop_chance:
+		return
+	var item := drop_scene.instantiate()
+	item.global_position = global_position
+	item.randomize_common_on_spawn = drop_random_common
+	if not drop_random_common:
+		item.power_type = specific_drop
+	get_parent().call_deferred("add_child", item)
