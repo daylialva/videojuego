@@ -2,19 +2,25 @@ extends Node
 
 signal status_changed(message: String)
 signal session_started
+signal intro_all_ready
 signal peer_ready(peer_id: int, level_number: int)
 signal peer_left(peer_id: int)
 
 const PORT: int = 27771
 const LEVEL_TWO: String = "res://scenes/levels/level2/level_2.tscn"
+const LEVEL_TWO_VIDEO: VideoStream = preload("res://Assets/videos/transicion_nivel2.ogv")
 const MENU_PATH: String = "res://scenes/main/gestor_escena.tscn"
 
 var active: bool = false
 var hosting: bool = false
 var connecting: bool = false
+var intro_started: bool = false
+var intro_released: bool = false
+var intro_ready: Dictionary = {}
 
 func _ready() -> void:
 	multiplayer.connected_to_server.connect(_connected)
+	multiplayer.peer_connected.connect(_peer_connected)
 	multiplayer.connection_failed.connect(_connection_failed)
 	multiplayer.server_disconnected.connect(_server_disconnected)
 	multiplayer.peer_disconnected.connect(_peer_disconnected)
@@ -30,7 +36,6 @@ func host_game() -> bool:
 	active = true
 	hosting = true
 	status_changed.emit("Partida creada. Puerto %d. Esperando otro jugador." % PORT)
-	session_started.emit()
 	return true
 
 func join_game(address: String) -> bool:
@@ -53,6 +58,9 @@ func close_session() -> void:
 	active = false
 	hosting = false
 	connecting = false
+	intro_started = false
+	intro_released = false
+	intro_ready.clear()
 	if multiplayer.multiplayer_peer != null:
 		multiplayer.multiplayer_peer.close()
 		multiplayer.multiplayer_peer = OfflineMultiplayerPeer.new()
@@ -60,14 +68,15 @@ func close_session() -> void:
 func _connected() -> void:
 	connecting = false
 	active = true
-	status_changed.emit("Conectado al anfitrión.")
-	session_started.emit()
+	status_changed.emit("Conectado al anfitrión. Esperando cinemática.")
 
 func _connection_failed() -> void:
 	close_session()
 	status_changed.emit("No se pudo conectar. Comprueba la IP y la red local.")
 
 func _server_disconnected() -> void:
+	if not active:
+		return
 	close_session()
 	status_changed.emit("El anfitrión se desconectó.")
 	get_tree().change_scene_to_file("res://scenes/main/gestor_escena.tscn")
@@ -75,6 +84,51 @@ func _server_disconnected() -> void:
 func _peer_disconnected(id: int) -> void:
 	peer_left.emit(id)
 	status_changed.emit("El otro jugador se desconectó.")
+	if hosting and intro_started and not intro_released:
+		close_session()
+		get_tree().call_deferred("change_scene_to_file", MENU_PATH)
+
+func _peer_connected(_peer_id: int) -> void:
+	if not active or not hosting or intro_started:
+		return
+	intro_started = true
+	_start_shared_intro.rpc()
+
+@rpc("authority", "call_local", "reliable")
+func _start_shared_intro() -> void:
+	intro_started = true
+	status_changed.emit("Reproduciendo cinemática.")
+	session_started.emit()
+
+func report_intro_finished() -> void:
+	if not active or not intro_started or intro_released:
+		return
+	if multiplayer.is_server():
+		intro_ready[1] = true
+		_check_intro_ready()
+	else:
+		_report_intro_finished.rpc_id(1)
+
+@rpc("any_peer", "call_remote", "reliable")
+func _report_intro_finished() -> void:
+	if not active or not multiplayer.is_server() or not intro_started:
+		return
+	intro_ready[multiplayer.get_remote_sender_id()] = true
+	_check_intro_ready()
+
+func _check_intro_ready() -> void:
+	if intro_released:
+		return
+	var peers := multiplayer.get_peers()
+	if peers.size() != 1 or not intro_ready.get(1, false) or not intro_ready.get(peers[0], false):
+		return
+	intro_released = true
+	_release_intro.rpc()
+
+@rpc("authority", "call_local", "reliable")
+func _release_intro() -> void:
+	intro_released = true
+	intro_all_ready.emit()
 
 @rpc("any_peer", "call_remote", "reliable")
 func announce_level_ready(level_number: int) -> void:
@@ -88,7 +142,7 @@ func advance_to_level_two() -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _change_to_level_two() -> void:
-	SceneTransition.change_level(LEVEL_TWO, "Nivel II: Dominios de Illapa")
+	SceneTransition.change_level(LEVEL_TWO, "Nivel II: Dominios de Illapa", LEVEL_TWO_VIDEO)
 
 func finish_cooperative_run() -> void:
 	if active and multiplayer.is_server():

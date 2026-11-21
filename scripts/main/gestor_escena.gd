@@ -38,8 +38,18 @@ func _start_intro() -> void:
 	add_child(intro)
 
 func _on_intro_finished(intro_node: Control) -> void:
+	if LanSession.active:
+		LanSession.report_intro_finished()
+		return
 	if is_instance_valid(intro_node):
 		intro_node.queue_free()
+	await get_tree().process_frame
+	_start_level()
+
+func _on_lan_intro_all_ready() -> void:
+	var intro := get_node_or_null("Intro")
+	if intro != null:
+		intro.queue_free()
 	await get_tree().process_frame
 	_start_level()
 
@@ -51,7 +61,6 @@ func continuar_juego(_origin: String) -> void:
 	if not SaveManager.load_game():
 		return
 	if SaveManager.checkpoint == SaveManager.LEVEL_TWO:
-		SaveManager.restore_checkpoint()
 		get_tree().change_scene_to_file("res://scenes/levels/level2/level_2.tscn")
 	else:
 		get_node("Menu").queue_free()
@@ -84,5 +93,6 @@ func _start_lan_game() -> void:
 		PlayerData.reset_run()
 	get_node("Menu").queue_free()
 	get_node("NetworkMenu").queue_free()
+	LanSession.intro_all_ready.connect(_on_lan_intro_all_ready)
 	await get_tree().process_frame
-	_start_level()
+	_start_intro()
