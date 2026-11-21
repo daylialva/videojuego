@@ -93,7 +93,7 @@ func _process(delta: float) -> void:
 			continue
 		var sprite := enemy.get_node_or_null("Sprite2D") as Sprite2D
 		var bar := enemy.get_node_or_null("HealthBar") as Range
-		enemy_state[str(get_parent().get_path_to(enemy))] = [enemy.global_position, sprite.frame if sprite != null else 0, sprite.flip_h if sprite != null else false, bar.value if bar != null else 0, bar.visible if bar != null else false]
+		enemy_state[str(get_parent().get_path_to(enemy))] = [enemy.global_position, sprite.frame if sprite != null else 0, sprite.flip_h if sprite != null else false, bar.value if bar != null else 0.0, bar.visible if bar != null else false]
 	var pickup_state: Dictionary = {}
 	for pickup in get_tree().get_nodes_in_group("lan_pickup"):
 		if get_parent().is_ancestor_of(pickup):

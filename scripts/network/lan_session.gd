@@ -7,7 +7,7 @@ signal peer_left(peer_id: int)
 
 const PORT: int = 27771
 const LEVEL_TWO: String = "res://scenes/levels/level2/level_2.tscn"
-const VICTORY: String = "res://scenes/main/victory_final.tscn"
+const MENU_PATH: String = "res://scenes/main/gestor_escena.tscn"
 
 var active: bool = false
 var hosting: bool = false
@@ -99,7 +99,8 @@ func finish_cooperative_run() -> void:
 func _finish_run() -> void:
 	if multiplayer.is_server():
 		SaveManager.finish_run()
-	SceneTransition.change_level(VICTORY, "FIN - APU: LA IRA DE LOS ANDES")
+	await SceneTransition.change_level(MENU_PATH, "FIN - APU: LA IRA DE LOS ANDES")
+	close_session()
 
 @rpc("any_peer", "call_remote", "reliable")
 func request_item_use(item_name: String) -> void:

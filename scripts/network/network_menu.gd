@@ -13,6 +13,7 @@ func _ready() -> void:
 	LanSession.status_changed.connect(_show_status)
 	LanSession.session_started.connect(_session_started)
 	address_input.text = "127.0.0.1"
+	$Window/Content/Host.grab_focus()
 
 func _host() -> void:
 	LanSession.host_game()

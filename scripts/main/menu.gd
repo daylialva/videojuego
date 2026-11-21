@@ -10,6 +10,7 @@ signal salir_pressed(origin: String)
 signal lan_pressed(origin: String)
 
 func _ready() -> void:
+	preload("res://scripts/ui/options_panel.gd").apply_saved_settings()
 	$VBoxContainer/Continuar.disabled = not SaveManager.has_save()
 
 func _on_nuevo_juego_pressed() -> void:

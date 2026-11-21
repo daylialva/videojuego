@@ -1,0 +1,166 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/options_panel.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://Assets/fonts/PirataOne-Regular.ttf" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="Frame"]
+bg_color = Color(0.045, 0.083, 0.095, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.74, 0.56, 0.32, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="Button"]
+bg_color = Color(0.055, 0.09, 0.10, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxFlat" id="ButtonHover"]
+bg_color = Color(0.12, 0.18, 0.18, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[node name="OptionsPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+script = ExtResource("1_script")
+
+[node name="Dimmer" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.01, 0.025, 0.035, 0.62)
+
+[node name="Window" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -263.0
+offset_top = -144.0
+offset_right = 237.0
+offset_bottom = 136.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("Frame")
+
+[node name="Content" type="Control" parent="Window"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="Window/Content"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 27.0
+offset_right = 470.0
+offset_bottom = 67.0
+theme_override_colors/font_color = Color(0.98, 0.79, 0.48, 1)
+theme_override_colors/font_outline_color = Color(0.14, 0.09, 0.06, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 29
+text = "Opciones"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MusicRow" type="HBoxContainer" parent="Window/Content"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 82.0
+offset_right = 470.0
+offset_bottom = 120.0
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="Window/Content/MusicRow"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Ambiente"
+vertical_alignment = 1
+
+[node name="Slider" type="HSlider" parent="Window/Content/MusicRow"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+step = 1.0
+value = 100.0
+scrollable = false
+
+[node name="Value" type="Label" parent="Window/Content/MusicRow"]
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "100%"
+vertical_alignment = 1
+
+[node name="EffectsRow" type="HBoxContainer" parent="Window/Content"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 128.0
+offset_right = 470.0
+offset_bottom = 166.0
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="Window/Content/EffectsRow"]
+custom_minimum_size = Vector2(90, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Efectos"
+vertical_alignment = 1
+
+[node name="Slider" type="HSlider" parent="Window/Content/EffectsRow"]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 100.0
+step = 1.0
+value = 100.0
+scrollable = false
+
+[node name="Value" type="Label" parent="Window/Content/EffectsRow"]
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "100%"
+vertical_alignment = 1
+
+[node name="Close" type="Button" parent="Window/Content"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 176.0
+offset_right = 470.0
+offset_bottom = 214.0
+theme_override_colors/font_color = Color(0.95, 0.94, 0.88, 1)
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("ButtonHover")
+theme_override_styles/pressed = SubResource("ButtonHover")
+text = "Cerrar"

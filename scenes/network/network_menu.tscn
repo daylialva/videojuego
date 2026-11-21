@@ -1,18 +1,38 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/network/network_menu.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://Assets/ui/buttons/Apu_Button_Normal.png" id="2_normal"]
+[ext_resource type="Texture2D" path="res://Assets/ui/buttons/Apu_Button_Hover.png" id="3_hover"]
+[ext_resource type="Texture2D" path="res://Assets/ui/buttons/Apu_Button_Pressed.png" id="4_pressed"]
+[ext_resource type="FontFile" path="res://Assets/fonts/PirataOne-Regular.ttf" id="5_font"]
 
 [sub_resource type="StyleBoxFlat" id="Frame"]
-bg_color = Color(0.055, 0.095, 0.105, 0.97)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
+bg_color = Color(0.045, 0.083, 0.095, 0.97)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 border_color = Color(0.74, 0.56, 0.32, 1)
 corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="AddressStyle"]
+bg_color = Color(0.1, 0.15, 0.16, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.58, 0.48, 0.31, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+content_margin_left = 12.0
+content_margin_right = 12.0
 
 [node name="NetworkMenu" type="Control"]
 layout_mode = 3
@@ -21,6 +41,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 0
 script = ExtResource("1_script")
 
 [node name="Dimmer" type="ColorRect" parent="."]
@@ -30,7 +51,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.015, 0.025, 0.035, 0.72)
+mouse_filter = 0
+color = Color(0.01, 0.025, 0.035, 0.72)
 
 [node name="Window" type="Panel" parent="."]
 layout_mode = 1
@@ -39,61 +61,147 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -265.0
-offset_top = -220.0
-offset_right = 265.0
-offset_bottom = 220.0
+offset_left = -305.0
+offset_top = -270.0
+offset_right = 305.0
+offset_bottom = 270.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("Frame")
 
 [node name="Content" type="VBoxContainer" parent="Window"]
 layout_mode = 1
-anchors_preset = 15
-anchor_left = 0.05
+anchor_left = 0.06
 anchor_top = 0.05
-anchor_right = 0.95
+anchor_right = 0.94
 anchor_bottom = 0.95
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 alignment = 1
 
 [node name="Title" type="Label" parent="Window/Content"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.77, 0.46, 1)
-theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.98, 0.79, 0.48, 1)
+theme_override_colors/font_outline_color = Color(0.14, 0.09, 0.06, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 36
 text = "Partida LAN"
 horizontal_alignment = 1
 
 [node name="Help" type="Label" parent="Window/Content"]
+custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
-text = "El anfitrión crea la partida. El otro jugador escribe su IP."
+theme_override_colors/font_color = Color(0.93, 0.91, 0.83, 1)
+theme_override_font_sizes/font_size = 15
+text = "Crea la partida o escribe la IP del anfitrión para unirte."
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 3
 
-[node name="Host" type="Button" parent="Window/Content"]
-custom_minimum_size = Vector2(0, 48)
+[node name="Host" type="TextureButton" parent="Window/Content"]
+custom_minimum_size = Vector2(320, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("2_normal")
+texture_pressed = ExtResource("4_pressed")
+texture_hover = ExtResource("3_hover")
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Window/Content/Host"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.98, 0.88, 0.68, 1)
+theme_override_colors/font_outline_color = Color(0.11, 0.065, 0.04, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 23
 text = "Crear partida"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AddressLabel" type="Label" parent="Window/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.78, 0.54, 1)
+theme_override_font_sizes/font_size = 16
+text = "IP del anfitrión"
+horizontal_alignment = 1
 
 [node name="Address" type="LineEdit" parent="Window/Content"]
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
-placeholder_text = "IP del anfitrión"
+theme_override_colors/font_color = Color(0.98, 0.95, 0.84, 1)
+theme_override_colors/font_placeholder_color = Color(0.65, 0.68, 0.63, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("AddressStyle")
+theme_override_styles/focus = SubResource("AddressStyle")
+placeholder_text = "192.168.1.10"
+alignment = 1
 
-[node name="Join" type="Button" parent="Window/Content"]
-custom_minimum_size = Vector2(0, 48)
+[node name="Join" type="TextureButton" parent="Window/Content"]
+custom_minimum_size = Vector2(320, 64)
 layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("2_normal")
+texture_pressed = ExtResource("4_pressed")
+texture_hover = ExtResource("3_hover")
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Window/Content/Join"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.98, 0.88, 0.68, 1)
+theme_override_colors/font_outline_color = Color(0.11, 0.065, 0.04, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 23
 text = "Unirse a la partida"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Status" type="Label" parent="Window/Content"]
-custom_minimum_size = Vector2(0, 48)
-layout_mode = 2
-autowrap_mode = 3
-horizontal_alignment = 1
-
-[node name="Back" type="Button" parent="Window/Content"]
 custom_minimum_size = Vector2(0, 42)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.87, 0.81, 1)
+theme_override_font_sizes/font_size = 14
+text = "Listo para conectar"
+autowrap_mode = 3
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Back" type="TextureButton" parent="Window/Content"]
+custom_minimum_size = Vector2(280, 58)
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("2_normal")
+texture_pressed = ExtResource("4_pressed")
+texture_hover = ExtResource("3_hover")
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Window/Content/Back"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.98, 0.88, 0.68, 1)
+theme_override_colors/font_outline_color = Color(0.11, 0.065, 0.04, 1)
+theme_override_constants/outline_size = 3
+theme_override_fonts/font = ExtResource("5_font")
+theme_override_font_sizes/font_size = 22
 text = "Volver al menú"
+horizontal_alignment = 1
+vertical_alignment = 1

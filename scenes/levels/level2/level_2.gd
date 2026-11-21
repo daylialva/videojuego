@@ -9,7 +9,6 @@ extends Node2D
 
 @export_group("Final Level Ending")
 @export_file("*.tscn") var main_menu_path: String = "res://scenes/main/gestor_escena.tscn"
-@export_file("*.tscn") var victory_scene_path: String = "res://scenes/main/victory_final.tscn"
 @export var final_chapter_title: String = "FIN - APU: LA IRA DE LOS ANDES"
 
 @onready var exit_portal: Area2D = $ExitPortal
@@ -102,15 +101,11 @@ func _on_exit_portal_body_entered(body: Node2D) -> void:
 		await suck_tween.finished
 
 		if is_final_level:
-			if not ResourceLoader.exists(victory_scene_path):
-				push_error("No se encontró la escena de victoria: " + victory_scene_path)
-				_on_player_game_over(true)
-				return
 			if LanSession.active:
 				LanSession.finish_cooperative_run()
 			else:
 				SaveManager.finish_run()
-				SceneTransition.change_level(victory_scene_path, final_chapter_title, transition_video)
+				SceneTransition.change_level(main_menu_path, final_chapter_title, transition_video)
 		elif ResourceLoader.exists(next_level_path):
 			SceneTransition.change_level(next_level_path, next_level_title, transition_video)
 		else:

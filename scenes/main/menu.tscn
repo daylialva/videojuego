@@ -177,6 +177,7 @@ vertical_alignment = 1
 
 [node name="AudioJugar" type="AudioStreamPlayer" parent="." unique_id=339629606]
 stream = ExtResource("8_qmr2i")
+bus = &"SFX"
 
 [connection signal="pressed" from="VBoxContainer/NuevoJuego" to="." method="_on_nuevo_juego_pressed"]
 [connection signal="pressed" from="VBoxContainer/Continuar" to="." method="_on_continuar_pressed"]

@@ -60,7 +60,9 @@ func continuar_juego(_origin: String) -> void:
 
 @warning_ignore("unused_parameter")
 func about_open(origin: String) -> void:
-	pass
+	var options_panel: Control = preload("res://scenes/ui/options_panel.tscn").instantiate()
+	add_child(options_panel)
+	options_panel.closed.connect(options_panel.queue_free)
 
 @warning_ignore("unused_parameter")
 func exit_game(origin: String) -> void:
@@ -69,7 +71,6 @@ func exit_game(origin: String) -> void:
 func open_lan_menu(_origin: String) -> void:
 	var network_menu: Control = preload("res://scenes/network/network_menu.tscn").instantiate()
 	add_child(network_menu)
-	get_node("Menu").hide()
 	network_menu.back_pressed.connect(func() -> void:
 		get_node("Menu").show()
 		network_menu.queue_free()
